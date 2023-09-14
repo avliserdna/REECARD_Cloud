@@ -8,8 +8,7 @@ const app = express();
 
 const mongoose = require('mongoose')
 
-const uri = "mongodb+srv://andrechristiansilva:monkaSteer42@cluster0.509qqi2.mongodb.net/?retryWrites=true&w=majority";
-
+const uri = process.env.uri
 async function connect() {
   try {
     await mongoose.connect(uri);
