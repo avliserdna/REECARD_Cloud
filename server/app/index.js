@@ -1,3 +1,4 @@
+
 let dotenv = require('dotenv').config()
 console.log(dotenv)
 const express = require('express');
@@ -10,6 +11,9 @@ const app = express();
 
 const mongoose = require('mongoose')
 
+const db = mongoose.connection
+
+console.log(db)
 const uri = process.env.uri
 async function connect() {
   try {
