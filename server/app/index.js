@@ -1,3 +1,5 @@
+let dotenv = require('dotenv').config()
+console.log(dotenv)
 const express = require('express');
 const app = express();
 // const aws = require('aws-sdk');
@@ -18,7 +20,7 @@ async function connect() {
     console.log(error)
   }
 }
-const port = 5000; // Change this value with env later on
+const port = process.env.PORT; // Change this value with env later on
 
 
 app.listen(port, () => console.log(`Server is listening on port ${port}`))
