@@ -15,6 +15,7 @@ const db = mongoose.connection
 
 
 const uri = process.env.uri
+mongoose.connect(uri, {useNewUrlParser:true})
 db.on('error', (error) => console.error(error));
 db.once('open', () => console.log("Server is on."))
 app.use(express.json())

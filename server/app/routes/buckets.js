@@ -5,6 +5,7 @@ const Buckets = require("../models/buckets")
 router.get('/', async (req, res) => {
   try {
     const buckets = await Buckets.find()
+    console.log(buckets)
     res.json(buckets)
   }
   catch (err) {

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
+const {Schema, model} = mongoose;
 
-const bucketSchema = new mongoose.Schema(
+const bucketSchema = new Schema(
  {
   bucket_key: {
     type: String,
@@ -28,7 +29,9 @@ const bucketSchema = new mongoose.Schema(
     default: Date.now
   }
 
- }
+ },
+ {collection: 'buckets'}
 )
-
-module.exports = mongoose.model('Buckets', bucketSchema)
+const Bucket = model('Bucket', bucketSchema)
+// module.exports = mongoose.model('Buckets', bucketSchema)
+ module.exports = Bucket;
