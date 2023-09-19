@@ -1,6 +1,6 @@
 
 let dotenv = require('dotenv').config()
-console.log(dotenv)
+
 const express = require('express');
 const app = express();
 // const aws = require('aws-sdk');
@@ -13,17 +13,14 @@ const mongoose = require('mongoose')
 
 const db = mongoose.connection
 
-console.log(db)
+
 const uri = process.env.uri
-async function connect() {
-  try {
-    await mongoose.connect(uri);
-    console.log("Successful connection to MongoDB")
-  }
-  catch (error) {
-    console.log(error)
-  }
-}
+db.on('error', (error) => console.error(error));
+db.once('open', () => console.log("Server is on."))
+app.use(express.json())
+
+const bucketsRouter  = require('./routes/buckets')
+app.use('/buckets', bucketsRouter)
 const port = process.env.PORT; // Change this value with env later on
 
 
