@@ -1,12 +1,12 @@
 const express = require('express')
 const router = express.Router()
-const Objects = require('../models/objects')
+const Files = require('../models/file')
 
 // get all Objects
 router.get('/', async (req, res) => {
   try {
-    const objects = await Objects.find()
-    res.json(objects)
+    const files = await Files.find()
+    res.json(files)
   }
   catch (err) {
     res.status(500).json({message: err.message})
@@ -15,41 +15,46 @@ router.get('/', async (req, res) => {
 
 // get ONE object
 router.get('/:id', getObject, (req,res) => {
-  res.json(getObject)
+  res.json(res.file)
 })
 
 // Upload Object
 router.post('/', async (req,res)=>{
-   const object = new Objects({
+   const file = new Files({
     file_name: req.body.file_name,
     file_type: req.body.file_type
    })
 
    try {
-    const newObject = object.save()
-    res.status(201).json(newObject)
+    const newFile = file.save()
+    res.status(201).json(newFile)
    }
    catch(err) {
     res.status(400).json({message: err.message})
    }
 })
 // Update Object
-router.put('/:id', async (req,res) => {
+router.put('/:id', getObject, (req,res) => {
+
 })
 // Delete Object
 
-router.delete('/:id', async (req,res) => {
+router.delete('/:id', getObject, async (req,res) => {
   try {
-
+    await res.file.remove();
+    res.json({message: 'Deleted Subscriber'})
+  }
+  catch (err) {
+    res.status(500).json({message: err.message})
   }
 })
 
-function getObject(req, res, next) {
-  let object;
+async function getObject(req, res, next) {
+  let file;
   try {
-    object = await Objects.findById(req.params.id)
-    if (!object) {
-      return res.status(404).json({message: "Cannot find object!"})
+    file = await Files.findById(req.params.id)
+    if (!file) {
+      return res.status(404).json({message: "Cannot find file!"})
     }
   }
   catch (err) {
