@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
 // get ONE object
 router.get('/:id', getObject, (req,res) => {
 
-  res.send(res.file)
+  res.json(res.file)
 })
 
 // Upload Object
@@ -56,7 +56,7 @@ router.put('/:id', async (req,res) => {
 router.delete('/:id', getObject, async (req,res) => {
   try {
     await res.file.remove();
-    res.json({message: 'Succesfully eleted File'})
+    res.json({message: 'Succesfully deleted File'})
   }
   catch (err) {
     res.status(500).json({message: err.message})
