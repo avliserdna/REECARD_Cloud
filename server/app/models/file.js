@@ -15,5 +15,11 @@ const fileSchema = new Schema (
       type: String,
       require: true
     }
+  },
+  {
+    collection: 'files'
   }
 )
+const File = model('File', fileSchema)
+
+module.exports = File;

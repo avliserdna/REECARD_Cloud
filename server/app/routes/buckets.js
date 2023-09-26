@@ -26,4 +26,16 @@ router.put('/', (req,res) =>{
 
 })
 
+async function getBucket(req, res, next) {
+  let bucket;
+  try {
+    file = await Buckets.findById(req.params.id)
+    if (!file) {
+      return res.status(400).json({message: "Cannot find bucket"})
+    }
+  }
+  catch (err) {
+    return res.status(500).json({message: err.message})
+  }
+}
 module.exports = router
