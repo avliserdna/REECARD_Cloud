@@ -1,13 +1,17 @@
 const express = require('express')
+const xml2js = require('xml2js')
 const router = express.Router()
 const Files = require('../models/file')
-
 // get all Objects
 router.get('/', async (req, res) => {
 
   try {
+
     const files = await Files.find()
-    res.json(files)
+    console.log(files)
+    parseXML = await convertToXML(files)
+    res.set('Content-Type', 'text/xml');
+    res.send(parseXML)
   }
   catch (err) {
     res.status(500).json({message: err.message})
@@ -16,8 +20,13 @@ router.get('/', async (req, res) => {
 
 // get ONE object
 router.get('/:id', getObject, (req,res) => {
-
-  res.json(res.file)
+  try {
+    parseXML = convertToXML(res.file)
+    res.send(parseXML)
+  }
+  catch (err) {
+    res.status(500).json({message: err.message})
+  }
 })
 
 // Upload Object
@@ -75,6 +84,17 @@ async function getObject(req, res, next) {
     return res.status(500).json({message: err.message})
   }
   res.file = file
+  console.log
   next()
 }
+
+ function convertToXML(data) {
+  id = data._id.toString()
+  data._id = id
+  const builder = new xml2js.Builder({ rootName: 'file', headless: false })
+  const xml = builder.buildObject({ID: id, FileKey: data.file_key, FileName: data.file_name, FileType: data.file_type})
+
+  return xml
+}
+
 module.exports = router
