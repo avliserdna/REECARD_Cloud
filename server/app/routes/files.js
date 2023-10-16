@@ -53,7 +53,9 @@ router.put('/:id', async (req,res) => {
     file = await Files.findOneAndUpdate(query, {$set: req.body})
     res.status(200)
     updateFile = await Files.findById(req.params.id)
-    res.json(updateFile)
+    updatedXML = await convertToXML(updateFile)
+    res.set('Content-Type', 'text/xml');
+    res.send(updatedXML)
   }
   catch (err) {
     res.status(400).json({message: err.message})
@@ -84,7 +86,6 @@ async function getObject(req, res, next) {
     return res.status(500).json({message: err.message})
   }
   res.file = file
-  console.log
   next()
 }
 
@@ -97,4 +98,9 @@ async function getObject(req, res, next) {
   return xml
 }
 
+// function convertGroupToXML(collection) {
+//   for (obj of collection) {
+
+//   }
+// }
 module.exports = router

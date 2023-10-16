@@ -1,6 +1,8 @@
 const express = require('express')
+const xml2js = require('xml2js')
 const router = express.Router()
 const Buckets = require("../models/buckets")
+const crypto = require('crypto')
 //Get ALL Buckets
 router.get('/', async (req, res) => {
   try {
@@ -14,13 +16,20 @@ router.get('/', async (req, res) => {
 
 //Get ONE bucket
 router.get('/:id', getBucket, (req, res) => {
-  res.json(res.bucket)
+  try {
+    parseBucket = convertToXML(res.bucket)
+    res.send(parseBucket)
+  }
+  catch (err) {
+    res.status(500).json({message: err.message})
+  }
 })
 
 //Create Bucket
 router.post('/', async (req,res) => {
+  const newKey = generateAPIKey()
   const bucket = new Buckets({
-    bucket_key: req.body.bucket_key,
+    bucket_key: newKey,
     bucket_name: req.body.bucket_name,
     attached_access: req.body.attached_access,
     attached_secret: req.body.attached_secret,
@@ -71,4 +80,18 @@ async function getBucket(req, res, next) {
   res.bucket = bucket
   next()
 }
+
+function convertToXML(data) {
+  id = data._id.toString()
+  const builder = new xml2js.Builder({ rootName: 'GetBucketResult', headless: false })
+  const xml = builder.buildObject({ Bucket: data.bucket_name, CreationDate: data.creationDate})
+
+  return xml
+}
 module.exports = router
+
+function generateAPIKey() {
+  const apiKeyLength = 23; // You can adjust the length as needed
+  const apiKey = crypto.randomBytes(apiKeyLength).toString('hex');
+  return apiKey;
+}

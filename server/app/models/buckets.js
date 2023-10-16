@@ -23,6 +23,11 @@ const bucketSchema = new Schema(
       }
     }
   ],
+  publicAccess : {
+    type: Boolean,
+    required: true,
+    default: false
+  },
   creationDate: {
     type: Date,
     required: true,
