@@ -2,6 +2,7 @@ const express = require('express')
 const xml2js = require('xml2js')
 const router = express.Router()
 const Users = require('../models/user')
+const crypto = require('crypto')
 const User = require('../models/user')
 
 // get All users (TEST PURPOSES)
@@ -28,6 +29,26 @@ router.get('/:id', getUser, (req, res) => {
   }
 })
 
+// MAKE NEW USER (FOR TESTING PURPOSES)
+
+router.post('/', async (req, res) => {
+  const newAccessKey = generateAPIKey()
+  const newSecretKey = generateAPIKey()
+  const user = new Users({
+    user_name: req.body.user_name,
+    password : req.body.password,
+    access_key: newAccessKey,
+    secret_key: newSecretKey
+  })
+  try {
+    const newUser = await user.save()
+    res.status(201).json(newUser)
+  }
+  catch (err) {
+    res.status(400).json({message: err.message})
+  }
+})
+
 async function getUser(req, res, next) {
   let user;
   try {
@@ -41,4 +62,10 @@ async function getUser(req, res, next) {
     }
     res.user = user
     next()
+  }
+
+ function generateAPIKey() {
+    const apiKeyLength = 23; // You can adjust the length as needed
+    const apiKey = crypto.randomBytes(apiKeyLength).toString('hex');
+    return apiKey;
   }

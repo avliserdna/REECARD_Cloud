@@ -3,10 +3,7 @@ const {Schema, model} = mongoose
 
 const userSchema = new Schema(
   {
-    user_key: {
-      type: String,
-      required: true
-    },
+
     user_name: {
       type: String,
       required: true
