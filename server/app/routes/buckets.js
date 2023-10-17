@@ -33,7 +33,6 @@ router.post('/', async (req,res) => {
     bucket_name: req.body.bucket_name,
     attached_access: req.body.attached_access,
     attached_secret: req.body.attached_secret,
-    files: req.body.files
   })
   try {
     const newBucket = await bucket.save()
@@ -84,7 +83,7 @@ async function getBucket(req, res, next) {
 function convertToXML(data) {
   id = data._id.toString()
   const builder = new xml2js.Builder({ rootName: 'GetBucketResult', headless: false })
-  const xml = builder.buildObject({ Bucket: data.bucket_name, CreationDate: data.creationDate})
+  const xml = builder.buildObject({ Bucket: data.bucket_name, CreationDate: data.creationDate.toDateString()})
 
   return xml
 }

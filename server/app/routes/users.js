@@ -49,6 +49,7 @@ router.post('/', async (req, res) => {
   }
 })
 
+// Gets a single user
 async function getUser(req, res, next) {
   let user;
   try {
@@ -64,8 +65,17 @@ async function getUser(req, res, next) {
     next()
   }
 
+  // Randomly generates an API key
  function generateAPIKey() {
     const apiKeyLength = 23; // You can adjust the length as needed
     const apiKey = crypto.randomBytes(apiKeyLength).toString('hex');
     return apiKey;
+  }
+
+  function convertToXML(data) {
+    id = data._id.toString()
+    const builder = new xml2js.Builder({ rootName: 'GetUserResponse', headless: false })
+    const xml = builder.buildObject({ UserID: id, UserName: data.user_name, CreateDate: data.creation_date})
+
+    return xml
   }
