@@ -1,24 +1,31 @@
 /* mySeedScript.js */
 
 // require the necessary libraries
-const faker = require("faker");
-const MongoClient = require("mongodb").MongoClient;
+const { faker } = require('@faker-js/faker');
 
+// const Bucket = require('../models/buckets')
+const MongoClient = require("mongodb").MongoClient;
+let dotenv = require('dotenv').config({path: '../.env'})
+const crypto = require('crypto')
 // function randomIntFromInterval(min, max) { // min and max included
 //     return Math.floor(Math.random() * (max - min + 1) + min);
 // }
 
+// async function clearAll() {
+//     await Bucket.deleteMany({})
+// }
+
 async function seedDB() {
     // Connection URL
+    //  clearAll()
     const uri = process.env.uri;
-
     const client = new MongoClient(uri, {
         useNewUrlParser: true,
         // useUnifiedTopology: true,
     });
 
     try {
-        await client.connect();
+        await client.startSession();
         console.log("Connected correctly to server");
 
         const collection = client.db("db").collection("buckets");
@@ -36,23 +43,17 @@ async function seedDB() {
             let newBucket = {
                 bucket_key: bucketKey,
                bucket_name: bucketName,
-                attached_access: [...generateAPIKey()],
-                attached_secret: [...generateAPIKey()]
+                attached_access: [generateAPIKey()],
+                attached_secret: [generateAPIKey()]
             };
 
-            // for (let j = 0; j < randomIntFromInterval(1, 6); j++) {
-            //     let newEvent = {
-            //         timestamp_event: faker.date.past(),
-            //         weight: randomIntFromInterval(14,16),
-            //     }
-            //     newBucket.events.push(newEvent);
-            // }
             timeSeriesData.push(newBucket);
         }
         collection.insertMany(timeSeriesData);
 
         console.log("Database seeded! :)");
         client.close();
+        return
     } catch (err) {
         console.log(err.stack);
     }
@@ -62,4 +63,5 @@ function generateAPIKey() {
     const apiKey = crypto.randomBytes(apiKeyLength).toString('hex');
     return apiKey;
   }
+
 seedDB();

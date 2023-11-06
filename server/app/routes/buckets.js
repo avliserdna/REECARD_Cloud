@@ -31,6 +31,7 @@ router.get('/:id', getBucket, async (req, res) => {
 router.get('/:id/files', getBucket, async (req, res) => {
   try {
     const files = await File.find({bucket_key: req.params.id})
+    console.log(files)
     const parsedData = convertToJoinedXML(res.bucket, files)
     res.send(parsedData)
   }
@@ -112,6 +113,7 @@ function generateAPIKey() {
 function convertToJoinedXML(data, joinedData) {
   id = data._id.toString()
   // joinedData is the files connected to the BucketID
+  console.log(joinedData)
   const builder = new xml2js.Builder({ rootName: 'GetBucketResult', headless: false, explicitArray: false })
   const xml = builder.buildObject({ Bucket: data.bucket_name, Files: joinedData, CreationDate: data.creationDate.toDateString(), }, joinedData)
   return xml

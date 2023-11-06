@@ -1,9 +1,10 @@
 /* mySeedScript.js */
 
 // require the necessary libraries
-const faker = require("faker");
+const { faker } = require('@faker-js/faker');
 const MongoClient = require("mongodb").MongoClient;
-
+let dotenv = require('dotenv').config({path: '../.env'})
+const crypto = require('crypto')
 // function randomIntFromInterval(min, max) { // min and max included
 //     return Math.floor(Math.random() * (max - min + 1) + min);
 // }
@@ -18,10 +19,10 @@ async function seedDB() {
     });
 
     try {
-        await client.connect();
+      await client.startSession();
         console.log("Connected correctly to server");
 
-        const collection = client.db("db").collection("buckets");
+        const collection = client.db("db").collection("files");
 
         // The drop() command destroys all data from a collection.
         // Make sure you run it against proper database and collection.
@@ -46,6 +47,7 @@ async function seedDB() {
 
         console.log("Database seeded! :)");
         client.close();
+        return
     } catch (err) {
         console.log(err.stack);
     }
