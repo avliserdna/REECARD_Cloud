@@ -29,5 +29,8 @@ const filesRouter = require('./routes/files')
 app.use('/files', filesRouter)
 const port = process.env.PORT; // Change this value with env later on
 
+// Users
+const userRouter = require('./routes/users')
+app.use('/users', userRouter)
 
 app.listen(port, () => console.log(`Server is listening on port ${port}`))

@@ -49,6 +49,10 @@ router.post('/', async (req, res) => {
   }
 })
 
+  // Gets a User's bucket
+  router.get('/:id/buckets', getUser, async (req, res) => {
+
+  })
 // Gets a single user
 async function getUser(req, res, next) {
   let user;
@@ -65,6 +69,7 @@ async function getUser(req, res, next) {
     next()
   }
 
+
   // Randomly generates an API key
  function generateAPIKey() {
     const apiKeyLength = 23; // You can adjust the length as needed
@@ -79,3 +84,5 @@ async function getUser(req, res, next) {
 
     return xml
   }
+
+  module.exports = router

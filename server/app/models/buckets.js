@@ -14,15 +14,8 @@ const bucketSchema = new Schema(
   attached_access:[String],
   attached_secret:[String],
   files:[
-    {
-      file_name: {
-        type: String
-      },
-      file_type: {
-        type: String
-      }
-    }
-  ],
+    {type: Schema.Types.ObjectId, ref: 'File'}
+   ],
   publicAccess : {
     type: Boolean,
     required: true,
@@ -31,8 +24,11 @@ const bucketSchema = new Schema(
   creationDate: {
     type: Date,
     required: true,
-    default: Date.now
-  }
+    default: Date.now()
+  },
+  acceptedUserKeys: [{
+    type: Schema.Types.ObjectId, ref: 'User'
+  }]
 
  },
  {collection: 'buckets'}

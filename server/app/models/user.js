@@ -23,7 +23,7 @@ const userSchema = new Schema(
     creation_date: {
       type: Date,
       required: true,
-      default: Date.now
+      default: Date.now()
     }
   },
   {collection: 'users'}
