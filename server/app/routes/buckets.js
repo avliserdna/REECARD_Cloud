@@ -6,6 +6,7 @@ const File = require("../models/file")
 const crypto = require('crypto')
 const Bucket = require('../models/buckets')
 const { DataBrew } = require('aws-sdk')
+const { SelectObjectContentEventStreamFilterSensitiveLog } = require('@aws-sdk/client-s3')
 //Get ALL Buckets
 router.get('/', async (req, res) => {
   try {
@@ -71,7 +72,7 @@ router.post('/:id', getBucket, async (req, res) => {
   res.bucket.attachedSecret.push(req.attachedSecret)
   await res.bucket.save();
 
-  response = postResponseXml(res.bucket)
+  response = convertToSingleXML(res.bucket)
 
   res.status(200).json(response)
  }
@@ -86,7 +87,8 @@ router.put('/:id', async (req,res) =>{
     bucket = await Buckets.findOneAndUpdate({_id: req.params.id}, {$set: req.body})
     res.status(200)
     updatedBucket = await Buckets.findById(req.params.id)
-    res.json(updatedBucket)
+    parseBucket = convertToSingleXML(updatedBucket)
+    res.send(parseBucket)
   }
   catch (err) {
     res.status(400).json({message: err.message})
@@ -97,7 +99,9 @@ router.put('/:id', async (req,res) =>{
 router.delete('/:id', getBucket, async (req, res) => {
   try {
     await res.bucket.remove();
-    res.json({message: 'Successfully deleted bucket!'})
+    const builder = new xml2js.Builder({ rootName: 'GetBucketResult', headless: false, explicitArray: false })
+    const xml = builder.buildObject({Message: "Bucket successfully deleted!"})
+    res.send(xml)
   }
   catch (err) {
     res.status(500).json({message: err.message})
@@ -120,8 +124,13 @@ async function getBucket(req, res, next) {
 
 function convertToSingleXML(data) {
   id = data._id.toString()
+  console.log(data)
   const builder = new xml2js.Builder({ rootName: 'GetBucketResult', headless: false })
-  const xml = builder.buildObject({id:id, bucketKey: data.bucketKey, bucketName: data.bucketName, files: data.files, publicAccess: data.publicAccess, creationDate: String(data.creationDate), accceptedUserKeys: data.accceptedUserKeys})
+  const holder = {id:id, bucketKey: data.bucketKey, bucketName: data.bucketName, files: data.files, publicAccess: data.publicAccess, creationDate: String(data.creationDate)}
+  for (let i = 0; i < data.acceptedUserKeys.length; i++) {
+    holder[`acceptedUserKey-${i+1}`] = data.acceptedUserKeys[i].toString()
+  }
+  const xml = builder.buildObject(holder)
 
   return xml
 }
@@ -131,11 +140,9 @@ function convertToXML(data) {
   for (let i = 0; i < data.length; i++) {
     const bit = data[i]
     id = bit._id.toString()
-    console.log(bit.accceptedUserKeys)
-    holder[i] = {id:id, bucketKey: bit.bucketKey, bucketName: bit.bucketName, files: bit.files, publicAccess: bit.publicAccess, creationDate: String(bit.creationDate), accceptedUserKeys: bit.accceptedUserKey ? bit.accceptedUserKey : []}
+    holder[i] = {id:id, bucketKey: bit.bucketKey, bucketName: bit.bucketName, files: bit.files, publicAccess: bit.publicAccess, creationDate: String(bit.creationDate)}
   }
-
-  const builder = new xml2js.Builder({ rootName: 'GetBucketResult', headless: false })
+  const builder = new xml2js.Builder({ rootName: 'GetBucketResult', headless: false, explicitArray:false})
   const xml = builder.buildObject(holder)
 
   return xml

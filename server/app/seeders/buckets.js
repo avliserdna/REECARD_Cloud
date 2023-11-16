@@ -36,10 +36,9 @@ async function seedDB() {
 
         const users = client.db("db").collection("users");
 
-        const randomUser = users.findOne()
+        const randomUser = await users.findOne()
         // make a bunch of time series data
         let timeSeriesData = [];
-
         for (let i = 0; i < 5000; i++) {
             const bucketKey = generateAPIKey() ;
             const bucketName = faker.word.noun();
@@ -50,10 +49,10 @@ async function seedDB() {
             };
             timeSeriesData.push(newBucket);
         }
-        collection.insertMany(timeSeriesData);
+       await collection.insertMany(timeSeriesData);
 
         console.log("Database seeded! :)");
-        client.close();
+      await client.close();
         return
     } catch (err) {
         console.log(err.stack);
