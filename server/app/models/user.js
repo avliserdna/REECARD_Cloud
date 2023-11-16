@@ -4,7 +4,7 @@ const {Schema, model} = mongoose
 const userSchema = new Schema(
   {
 
-    user_name: {
+    userName: {
       type: String,
       required: true
     },
@@ -12,15 +12,15 @@ const userSchema = new Schema(
       type: String,
       required: true
     },
-    access_key: {
+    accessKey: {
       type: String,
-      required: true
+      // required: true
     },
-    secret_key: {
+    secretKey: {
       type: String,
-      required: true
+      // required: true
     },
-    creation_date: {
+    creationDate: {
       type: Date,
       required: true,
       default: Date.now()

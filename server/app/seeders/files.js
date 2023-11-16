@@ -36,9 +36,9 @@ async function seedDB() {
             const fileName = faker.word.noun();
             const fileType = `${faker.word.noun()}.png`
             let newFile = {
-                bucket_key: bucketKey,
-               file_key: fileName,
-               file_type: fileType
+                bucketKey: bucketKey,
+               fileKey: fileName,
+               fileType: fileType
             };
 
             timeSeriesData.push(newFile);

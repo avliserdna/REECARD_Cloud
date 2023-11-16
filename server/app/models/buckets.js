@@ -3,16 +3,14 @@ const {Schema, model} = mongoose;
 
 const bucketSchema = new Schema(
  {
-  bucket_key: {
+  bucketKey: {
     type: String,
     required: true
   },
-  bucket_name: {
+  bucketName: {
     type: String,
     required: true
   },
-  attached_access:[String],
-  attached_secret:[String],
   files:[
     {type: Schema.Types.ObjectId, ref: 'File'}
    ],
@@ -33,6 +31,7 @@ const bucketSchema = new Schema(
  },
  {collection: 'buckets'}
 )
+
 const Bucket = model('Bucket', bucketSchema)
 // module.exports = mongoose.model('Buckets', bucketSchema)
  module.exports = Bucket;

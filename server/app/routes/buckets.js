@@ -4,11 +4,14 @@ const router = express.Router()
 const Buckets = require("../models/buckets")
 const File = require("../models/file")
 const crypto = require('crypto')
+const Bucket = require('../models/buckets')
+const { DataBrew } = require('aws-sdk')
 //Get ALL Buckets
 router.get('/', async (req, res) => {
   try {
     const buckets = await Buckets.find()
-    res.json(buckets)
+    xmlBuckets = convertToXML(buckets)
+    res.send(xmlBuckets)
   }
   catch (err) {
     res.status(500).json({message: err.message})
@@ -18,7 +21,7 @@ router.get('/', async (req, res) => {
 //Get ONE bucket
 router.get('/:id', getBucket, async (req, res) => {
   try {
-    parseBucket = convertToXML(res.bucket)
+    parseBucket = convertToSingleXML(res.bucket)
     res.send(parseBucket)
   }
   catch (err) {
@@ -44,10 +47,10 @@ router.get('/:id/files', getBucket, async (req, res) => {
 router.post('/', async (req,res) => {
   const newKey = generateAPIKey()
   const bucket = new Buckets({
-    bucket_key: newKey,
-    bucket_name: req.body.bucket_name,
-    attached_access: [...req.body.attached_access],
-    attached_secret: [...req.body.attached_secret],
+    bucketKey: newKey,
+    bucketName: req.body.bucket_name,
+    attachedAccess: [req.body.attached_access],
+    attachedSecret: [req.body.attached_secret],
   })
   try {
     const newBucket = await bucket.save()
@@ -57,6 +60,26 @@ router.post('/', async (req,res) => {
     res.status(400).json({message: err.message})
   }
 })
+
+// Add access and secret key access to a bucket
+router.post('/:id', getBucket, async (req, res) => {
+ try{
+  if (!req.body.attached_access || !req.body.attached_secret) {
+    throw new Error("Access/Secret Key can not be empty!")
+  }
+  res.bucket.attachedAccess.push(req.attachedAccess)
+  res.bucket.attachedSecret.push(req.attachedSecret)
+  await res.bucket.save();
+
+  response = postResponseXml(res.bucket)
+
+  res.status(200).json(response)
+ }
+catch (err) {
+  res.status(400).json({message: err.message})
+}
+})
+
 //Update Buckets
 router.put('/:id', async (req,res) =>{
   try {
@@ -95,14 +118,29 @@ async function getBucket(req, res, next) {
   next()
 }
 
-function convertToXML(data) {
+function convertToSingleXML(data) {
   id = data._id.toString()
   const builder = new xml2js.Builder({ rootName: 'GetBucketResult', headless: false })
-  const xml = builder.buildObject({ Bucket: data.bucket_name, CreationDate: data.creationDate.toDateString()})
+  const xml = builder.buildObject({id:id, bucketKey: data.bucketKey, bucketName: data.bucketName, files: data.files, publicAccess: data.publicAccess, creationDate: String(data.creationDate), accceptedUserKeys: data.accceptedUserKeys})
 
   return xml
 }
-module.exports = router
+
+function convertToXML(data) {
+  const holder = []
+  for (let i = 0; i < data.length; i++) {
+    const bit = data[i]
+    id = bit._id.toString()
+    console.log(bit.accceptedUserKeys)
+    holder[i] = {id:id, bucketKey: bit.bucketKey, bucketName: bit.bucketName, files: bit.files, publicAccess: bit.publicAccess, creationDate: String(bit.creationDate), accceptedUserKeys: bit.accceptedUserKey ? bit.accceptedUserKey : []}
+  }
+
+  const builder = new xml2js.Builder({ rootName: 'GetBucketResult', headless: false })
+  const xml = builder.buildObject(holder)
+
+  return xml
+}
+
 
 function generateAPIKey() {
   const apiKeyLength = 23; // You can adjust the length as needed
@@ -115,6 +153,15 @@ function convertToJoinedXML(data, joinedData) {
   // joinedData is the files connected to the BucketID
   console.log(joinedData)
   const builder = new xml2js.Builder({ rootName: 'GetBucketResult', headless: false, explicitArray: false })
-  const xml = builder.buildObject({ Bucket: data.bucket_name, Files: joinedData, CreationDate: data.creationDate.toDateString(), }, joinedData)
+  const xml = builder.buildObject(data, joinedData)
   return xml
 }
+
+function postResponseXml(data) {
+  id = data._id.toString()
+  const builder = new xml2js.Builder({rootName: 'PostResult', headless: false})
+  const xml = builder.buildObject(data)
+  return xml
+}
+
+module.exports = router

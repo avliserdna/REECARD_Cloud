@@ -33,8 +33,8 @@ router.get('/:id', getObject, (req,res) => {
 // Upload Object
 router.post('/', async (req,res)=>{
    const file = new Files({
-    file_name: req.body.file_name,
-    file_type: req.body.file_type
+    fileName: req.body.file_name,
+    fileType: req.body.file_type
    })
 
    try {

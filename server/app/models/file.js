@@ -3,20 +3,20 @@ const {Schema, model} = mongoose;
 
 const fileSchema = new Schema (
   {
-    bucket_key: {
+    bucketKey: {
       type: Schema.Types.ObjectId,
       required: true,
       ref: "Bucket"
     },
-    file_key: {
+    fileKey: {
       type: String,
       require: true
     },
-    file_name: {
+    fileName: {
       type: String,
       require: true
     },
-    file_type: {
+    fileType: {
       type: String,
       require: true
     }

@@ -35,10 +35,10 @@ async function seedDB() {
             const userName = faker.person.firstName() ;
             const password = faker.word.noun();
             let newUser = {
-                user_name: userName,
+                userName: userName,
                password: password,
-                access_key: generateAPIKey(),
-                secret_key: generateAPIKey()
+                accessKey: generateAPIKey(),
+                secretKey: generateAPIKey()
             };
 
             timeSeriesData.push(newUser);

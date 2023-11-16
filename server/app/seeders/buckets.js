@@ -34,6 +34,9 @@ async function seedDB() {
         // Make sure you run it against proper database and collection.
         collection.drop();
 
+        const users = client.db("db").collection("users");
+
+        const randomUser = users.findOne()
         // make a bunch of time series data
         let timeSeriesData = [];
 
@@ -41,12 +44,10 @@ async function seedDB() {
             const bucketKey = generateAPIKey() ;
             const bucketName = faker.word.noun();
             let newBucket = {
-                bucket_key: bucketKey,
-               bucket_name: bucketName,
-                attached_access: [generateAPIKey()],
-                attached_secret: [generateAPIKey()]
+                bucketKey: bucketKey,
+               bucketName: bucketName,
+               acceptedUserKeys:[randomUser._id]
             };
-
             timeSeriesData.push(newBucket);
         }
         collection.insertMany(timeSeriesData);
